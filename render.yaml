@@ -1,0 +1,14 @@
+services:
+  - type: web
+    name: expl-sea-battle
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci --registry https://registry.npmjs.org/ || npm install --registry https://registry.npmjs.org/
+    startCommand: npm start
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NPM_CONFIG_REGISTRY
+        value: https://registry.npmjs.org/

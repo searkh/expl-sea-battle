@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Морской бой</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%E2%9A%93%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <span class="mark">EXPL</span>
+      <h1>Морской бой</h1>
+    </div>
+    <p id="phase-label" class="phase-label">Локально или онлайн в браузере</p>
+    <div class="who" id="who"></div>
+  </header>
+  <main id="stage" class="stage"></main>
+  <footer class="foot">Попадание — ход продолжается. Промах — поле блюрится, и игроки меняются.</footer>
+  <div id="handoff" class="handoff" hidden role="dialog" aria-modal="true" aria-labelledby="ho-title">
+    <div class="card">
+      <p class="eyebrow" id="ho-eye"></p>
+      <h2 id="ho-title"></h2>
+      <p id="ho-text"></p>
+      <button type="button" id="ho-btn" class="btn primary"></button>
+    </div>
+  </div>
+  <p id="live" class="sr" aria-live="polite"></p>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/online.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
