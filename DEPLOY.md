@@ -17,3 +17,5 @@ git ls-files img/
 
 Проверка на проде: открыть в браузере  
 `https://ВАШ-URL/img/water-tile-36px.png` — должен быть PNG, не 404.
+
+Матросы в воде: `img/sailor-1.png` … `img/sailor-3.png`.

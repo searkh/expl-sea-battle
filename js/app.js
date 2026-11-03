@@ -191,10 +191,19 @@ function markersLayerHTML(player, board, reveal) {
       const ship = shipId ? player.ships.find((item) => item.id === shipId) : null;
       if (shot === 'hit' && ship && shouldShowShip(ship, reveal)) continue;
 
+      if (shot === 'splash') {
+        const pick = (r * 7 + c * 11 + r * c) % Atlas.sailorCount;
+        const src = esc(Atlas.sailorSrc(pick));
+        const jx = ((r * 17 + c * 31) % 7) - 3;
+        const jy = ((r * 13 + c * 19) % 5) - 2;
+        const freshCls = fresh ? ' fresh' : '';
+        html += `<img class="sailor-marker${freshCls}" src="${src}" alt="" style="--gr:${r};--gc:${c};--jx:${jx}px;--jy:${jy}px;--phase:${(r + c) % 5}">`;
+        continue;
+      }
+
       const cls = ['shot-marker'];
       if (shot === 'hit') cls.push('hit');
       else if (shot === 'miss') cls.push('miss');
-      else if (shot === 'splash') cls.push('splash');
       if (fresh) cls.push('fresh');
       html += `<span class="${cls.join(' ')}" style="--gr:${r};--gc:${c}"></span>`;
     }

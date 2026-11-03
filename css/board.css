@@ -229,16 +229,30 @@
     radial-gradient(circle at 50% 55%, rgba(255, 255, 255, 0.95) 0%, rgba(180, 220, 240, 0.55) 35%, transparent 62%);
 }
 
-.shot-marker.splash {
-  display: grid;
-  place-items: center;
-  font-size: calc(var(--cell) * 0.55);
-  animation: sailor-bob 2.2s ease-in-out infinite;
+.sailor-marker {
+  position: absolute;
+  z-index: 4;
+  width: calc(var(--cell) * 0.82);
+  height: calc(var(--cell) * 0.82);
+  left: calc(
+    var(--gc) * (var(--cell) + var(--sea-gap))
+    + (var(--cell) - var(--cell) * 0.82) / 2
+    + var(--jx, 0px)
+  );
+  top: calc(
+    var(--gr) * (var(--cell) + var(--sea-gap))
+    + (var(--cell) - var(--cell) * 0.82) / 2
+    + var(--jy, 0px)
+  );
+  object-fit: contain;
+  pointer-events: none;
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45));
+  animation: sailor-bob 2.4s ease-in-out infinite;
+  animation-delay: calc(var(--phase, 0) * -0.35s);
 }
 
-.shot-marker.splash::before {
-  content: "🧑‍✈️";
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.4));
+.sailor-marker.fresh {
+  animation: sailor-bob 2.4s ease-in-out infinite, fresh-pop 0.5s ease;
 }
 
 .shot-marker.fresh {

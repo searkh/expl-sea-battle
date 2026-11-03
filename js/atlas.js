@@ -4,6 +4,12 @@
 const Atlas = (() => {
   const water = 'img/water-tile-36px.png';
 
+  const sailors = [
+    'img/sailor-1.png',
+    'img/sailor-2.png',
+    'img/sailor-3.png',
+  ];
+
   const file = {
     head: { h: 'bow-horizontal', v: 'bow-vertical' },
     mid: { h: 'middle-horizontal', v: 'middle-vertical' },
@@ -21,5 +27,9 @@ const Atlas = (() => {
     return water;
   }
 
-  return { waterSrc, segmentSrc };
+  function sailorSrc(index) {
+    return sailors[Math.abs(index) % sailors.length];
+  }
+
+  return { waterSrc, segmentSrc, sailorSrc, sailorCount: sailors.length };
 })();
