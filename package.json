@@ -4,6 +4,7 @@
   "private": true,
   "description": "Морской бой — локально и онлайн",
   "scripts": {
+    "slice-sprites": "powershell -ExecutionPolicy Bypass -File scripts/slice-sprites.ps1",
     "start": "node server.js",
     "dev": "node server.js"
   },

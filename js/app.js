@@ -125,19 +125,93 @@ function segmentClass(cells, r, c) {
   return 'seg-v-mid';
 }
 
+function segmentPart(cells, r, c) {
+  const seg = segmentClass(cells, r, c);
+  if (seg === 'seg-single') return 'single';
+  if (seg.startsWith('seg-h')) {
+    if (seg.endsWith('-start')) return 'head';
+    if (seg.endsWith('-end')) return 'tail';
+    return 'mid';
+  }
+  /* Вертикаль: нос вниз (max r), якорь сверху */
+  if (seg.endsWith('-start')) return 'tail';
+  if (seg.endsWith('-end')) return 'head';
+  return 'mid';
+}
+
+function shipOrientation(ship) {
+  if (ship.cells.length < 2) return 'h';
+  const a = ship.cells[0];
+  const b = ship.cells[1];
+  return a.r === b.r ? 'h' : 'v';
+}
+
+function shouldShowShip(ship, reveal) {
+  if (reveal === 'own' || reveal === 'all') return true;
+  if (reveal === 'sunk' && ship.sunk) return true;
+  return false;
+}
+
+function shipsLayerHTML(player, reveal) {
+  let html = '<div class="ship-layer" aria-hidden="true">';
+  player.ships.forEach((ship) => {
+    if (!shouldShowShip(ship, reveal)) return;
+    if (!ship.cells || ship.cells.length === 0) return;
+    const ori = shipOrientation(ship);
+    const sorted = [...ship.cells].sort((a, b) => (ori === 'h' ? a.c - b.c : a.r - b.r));
+    const minR = Math.min(...sorted.map((cell) => cell.r));
+    const minC = Math.min(...sorted.map((cell) => cell.c));
+    const segs = sorted.map((cell) => {
+      const part = segmentPart(ship.cells, cell.r, cell.c);
+      const cellHit = player.shots[`${cell.r},${cell.c}`] === 'hit';
+      const burning = ship.sunk || cellHit;
+      const src = esc(Atlas.segmentSrc(part, ori, burning));
+      const cls = ['ship-strip-seg', `part-${part}`];
+      if (burning) cls.push('is-burning');
+      return `<img class="${cls.join(' ')}" src="${src}" alt="">`;
+    }).join('');
+    html += `<div class="ship-strip ori-${ori} len-${ship.size}" style="--ship-r:${minR};--ship-c:${minC}">${segs}</div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function markersLayerHTML(player, board, reveal) {
+  let html = '<div class="markers-layer" aria-hidden="true">';
+  for (let r = 0; r < SeaBattle.SIZE; r += 1) {
+    for (let c = 0; c < SeaBattle.SIZE; c += 1) {
+      const shot = player.shots[`${r},${c}`];
+      const fresh = state.lastShot
+        && state.lastShot.board === board
+        && state.lastShot.r === r
+        && state.lastShot.c === c;
+      if (!shot && !fresh) continue;
+
+      const shipId = player.grid[r][c];
+      const ship = shipId ? player.ships.find((item) => item.id === shipId) : null;
+      if (shot === 'hit' && ship && shouldShowShip(ship, reveal)) continue;
+
+      const cls = ['shot-marker'];
+      if (shot === 'hit') cls.push('hit');
+      else if (shot === 'miss') cls.push('miss');
+      else if (shot === 'splash') cls.push('splash');
+      if (fresh) cls.push('fresh');
+      html += `<span class="${cls.join(' ')}" style="--gr:${r};--gc:${c}"></span>`;
+    }
+  }
+  html += '</div>';
+  return html;
+}
+
 function cellHTML(player, r, c, reveal, board) {
   const key = `${r},${c}`;
   const shot = player.shots[key];
   const shipId = player.grid[r][c];
   const ship = shipId ? player.ships.find((item) => item.id === shipId) : null;
-  const showShip = Boolean(
-    ship && (reveal === 'own' || reveal === 'all' || (reveal === 'sunk' && ship.sunk))
-  );
   const classes = ['cell'];
-  if (showShip) classes.push('ship', segmentClass(ship.cells, r, c));
-  if (ship && ship.sunk && showShip) classes.push('sunk');
   if (shot === 'hit') classes.push('hit');
-  if (shot === 'miss') classes.push('miss');
+  else if (shot === 'miss') classes.push('miss');
+  else if (shot === 'splash') classes.push('splash');
   if (
     state.lastShot &&
     state.lastShot.board === board &&
@@ -148,17 +222,21 @@ function cellHTML(player, r, c, reveal, board) {
   }
 
   let detail = '';
-  if (shot === 'miss') detail = ', мимо';
+  if (shot === 'splash') detail = ', матрос в воде';
+  else if (shot === 'miss') detail = ', мимо';
   else if (shot === 'hit' && ship && ship.sunk) detail = ', потоплен';
   else if (shot === 'hit') detail = ', попадание';
-  else if (showShip && reveal === 'own') detail = ', ваш корабль';
 
   const label = `${SeaBattle.COLS[c]}${r + 1}${detail}`;
-  return `<button type="button" class="${classes.join(' ')}" data-board="${board}" data-r="${r}" data-c="${c}" aria-label="${label}"></button>`;
+  const wave = (r + c) % 4;
+  const water = esc(Atlas.waterSrc());
+
+  return `<button type="button" class="${classes.join(' ')}" data-board="${board}" data-r="${r}" data-c="${c}" data-wave="${wave}" aria-label="${label}"><span class="cell-water" style="background-image:url('${water}')" aria-hidden="true"></span></button>`;
 }
 
 function gridHTML(player, reveal, board, owner) {
-  let html = `<div class="grid" data-board="${board}" data-owner="${owner}">`;
+  let html = `<div class="sea-board" data-owner="${owner}">`;
+  html += `<div class="grid" data-board="${board}" data-owner="${owner}">`;
   html += '<div class="coord corner"></div>';
   for (let c = 0; c < SeaBattle.SIZE; c += 1) {
     html += `<div class="coord">${SeaBattle.COLS[c]}</div>`;
@@ -169,6 +247,9 @@ function gridHTML(player, reveal, board, owner) {
       html += cellHTML(player, r, c, reveal, board);
     }
   }
+  html += '</div>';
+  html += shipsLayerHTML(player, reveal);
+  html += markersLayerHTML(player, board, reveal);
   html += '</div>';
   return html;
 }

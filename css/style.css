@@ -1,3 +1,5 @@
+@import url("board.css");
+
 :root {
   --bg: #07141c;
   --ink: #e8f4f6;
@@ -20,7 +22,7 @@
 html, body { margin: 0; min-height: 100%; }
 
 body {
-  font-family: Bahnschrift, "Segoe UI", sans-serif;
+  font-family: Nunito, Bahnschrift, "Segoe UI", sans-serif;
   color: var(--ink);
   background:
     radial-gradient(900px 420px at 8% -10%, rgba(226, 182, 87, 0.14), transparent 55%),
@@ -356,98 +358,6 @@ input:focus-visible, button:focus-visible, .cell:focus-visible {
 
 .panel-head p, .hint { color: var(--muted); font-size: 13px; line-height: 1.4; }
 
-.grid {
-  display: grid;
-  grid-template-columns: var(--head) repeat(10, var(--cell));
-  grid-template-rows: var(--head) repeat(10, var(--cell));
-  gap: 3px;
-  width: max-content;
-  user-select: none;
-}
-
-.grid[data-owner="0"] { --ship: var(--brass); }
-.grid[data-owner="1"] { --ship: var(--aqua); }
-
-.coord {
-  display: grid;
-  place-items: center;
-  color: var(--muted);
-  font-size: 12px;
-}
-
-.cell {
-  width: var(--cell);
-  height: var(--cell);
-  min-width: 0;
-  padding: 0;
-  border: 0;
-  border-radius: 5px;
-  background: var(--water);
-  position: relative;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03);
-}
-
-.stage[data-mode="place"] .cell { cursor: pointer; }
-
-.stage[data-mode="battle"]:not(.is-locked) .cell[data-board="enemy"]:not(.hit):not(.miss) {
-  cursor: crosshair;
-}
-
-.stage[data-mode="battle"]:not(.is-locked) .cell[data-board="enemy"]:not(.hit):not(.miss):not(.ship):hover {
-  background: #245272;
-}
-
-.cell.ship { background: color-mix(in srgb, var(--ship, var(--accent)) 78%, #102838); }
-.cell.ship.hit { background: color-mix(in srgb, var(--hit) 48%, var(--ship, var(--accent))); }
-.cell.ship.sunk { background: color-mix(in srgb, var(--hit) 28%, #5c6770); }
-
-.cell.seg-single { border-radius: 999px; }
-.cell.seg-h-start { border-radius: 999px 7px 7px 999px; }
-.cell.seg-h-end { border-radius: 7px 999px 999px 7px; }
-.cell.seg-v-start { border-radius: 999px 999px 7px 7px; }
-.cell.seg-v-end { border-radius: 7px 7px 999px 999px; }
-
-.cell.hit:not(.ship) { background: #3c1e24; }
-
-.cell.hit::after, .cell.miss::after {
-  content: "";
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.cell.hit::after {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #ffe4de;
-  box-shadow: 0 0 0 4px rgba(255, 90, 60, 0.9);
-}
-
-.cell.miss::after {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(190, 222, 234, 0.95);
-}
-
-.cell.fresh::before {
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  border: 2px solid #fff;
-  animation: pop 0.5s ease;
-  pointer-events: none;
-}
-
-.cell.ghost-ok { box-shadow: inset 0 0 0 2px #8ee08a; background: rgba(142, 224, 138, 0.35); }
-.cell.ghost-bad { box-shadow: inset 0 0 0 2px var(--hit); background: rgba(255, 90, 60, 0.32); }
-
-.grid.shake { animation: shake 0.28s ease; }
-
 .yard { display: flex; flex-direction: column; gap: 10px; }
 .yard .log { min-height: 2.6em; }
 .yard .btn { width: 100%; }
@@ -476,13 +386,6 @@ input:focus-visible, button:focus-visible, .cell:focus-visible {
 }
 
 .pips { display: flex; gap: 3px; align-items: center; }
-.pips i, .track .pips i {
-  width: 12px;
-  height: 12px;
-  border-radius: 3px;
-  display: block;
-  background: var(--accent);
-}
 
 .dock.orient-v .pips { flex-direction: column; align-items: flex-start; }
 
@@ -598,4 +501,5 @@ input:focus-visible, button:focus-visible, .cell:focus-visible {
     animation: none !important;
     transition: none !important;
   }
+  .sailor-sprite { animation: none !important; }
 }

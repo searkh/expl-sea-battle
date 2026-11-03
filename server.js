@@ -77,6 +77,7 @@ function stripPlayerForClient(player, view) {
       size: s.size,
       name: s.name,
       sunk: s.sunk,
+      cells: s.sunk ? s.cells : undefined,
     })),
   };
 }
@@ -217,7 +218,19 @@ const httpServer = createServer(app);
 const io = new Server(httpServer);
 global.__io = io;
 
-app.use(express.static(path.join(__dirname)));
+const root = __dirname;
+app.use(
+  express.static(root, {
+    etag: true,
+    setHeaders(res, filePath) {
+      if (filePath.includes(`${path.sep}img${path.sep}`)) {
+        res.setHeader('Cache-Control', 'public, max-age=86400');
+      } else if (/\.(html|js|css)$/i.test(filePath)) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  })
+);
 
 io.on('connection', (socket) => {
   let joinedCode = null;

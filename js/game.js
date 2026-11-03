@@ -137,7 +137,7 @@ const SeaBattle = (() => {
           const key = shotKey(r, c);
           if (player.shots[key]) continue;
           if (player.grid[r][c]) continue;
-          player.shots[key] = 'miss';
+          player.shots[key] = 'splash';
         }
       }
     });
